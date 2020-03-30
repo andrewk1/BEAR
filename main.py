@@ -1,6 +1,8 @@
 import gym
 import numpy as np
 import torch
+import robosuite
+import batchRL
 import argparse
 import os
 
@@ -113,15 +115,26 @@ if __name__ == "__main__":
 	if args.env_name == 'Multigoal-v0':
 		env = point_mass.MultiGoalEnv(distance_cost_coeff=10.0)
 	else:
-		env = gym.make(args.env_name)
+		env = robosuite.make(
+			"SawyerVisualPickPlaceCan",
+			has_renderer=False,        
+			has_offscreen_renderer=True,
+			ignore_done=True,
+			use_camera_obs=False,
+			gripper_visualization=False,#True,
+			reward_shaping=True,
+			control_freq=100, 
+			hide_visual=True,
+        	# single_object_mode=2,
+		)
 
-	env.seed(seed)
+	# env.seed(seed)
 	torch.manual_seed(seed)
 	np.random.seed(seed)
 	
-	state_dim = env.observation_space.shape[0]
-	action_dim = env.action_space.shape[0] 
-	max_action = float(env.action_space.high[0])
+	state_dim = 44 #env.observation_space.shape[0]
+	action_dim = 3 #env.action_space.shape[0] 
+	max_action = 0.05 #float(env.action_space.high[0])
 	print (state_dim, action_dim)
 	print ('Max action: ', max_action)
 

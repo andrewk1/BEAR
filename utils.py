@@ -60,10 +60,9 @@ class ReplayBuffer(object):
 		np.save("./buffers/"+filename+".npy", self.storage)
 
 	def load(self, filename, bootstrap_dim=None):
-		with gzip.open(filename, 'rb') as f:
-				self.storage = pickle.load(f)
-		# with open(filename, 'rb') as f:
-		#        self.storage = pickle.load(f)
+		with open(filename, 'rb') as f:
+			self.storage = pickle.load(f)
+		# with open(filename, 'rb') as f: #        self.storage = pickle.load(f)
 
 		# storage = np.load(filename)
 		# self.storage = dict()
@@ -72,14 +71,15 @@ class ReplayBuffer(object):
 		sum_returns = self.storage['rewards'].sum()
 		num_traj = self.storage['terminals'].sum()
 		if num_traj == 0:
-				num_traj = 1000
+			num_traj = 1000
 		average_per_traj_return = sum_returns/num_traj
 		print ("Average Return: ", average_per_traj_return)
+		print("Max action", max(self.storage['actions'].flatten()))
 		# import ipdb; ipdb.set_trace()
 		
 		num_samples = self.storage['observations'].shape[0]
 		if bootstrap_dim is not None:
-				self.bootstrap_dim = bootstrap_dim
-				bootstrap_mask = np.random.binomial(n=1, size=(1, num_samples, bootstrap_dim,), p=0.8)
-				bootstrap_mask = np.squeeze(bootstrap_mask, axis=0)
-				self.storage['bootstrap_mask'] = bootstrap_mask[:num_samples]
+			self.bootstrap_dim = bootstrap_dim
+			bootstrap_mask = np.random.binomial(n=1, size=(1, num_samples, bootstrap_dim,), p=0.8)
+			bootstrap_mask = np.squeeze(bootstrap_mask, axis=0)
+			self.storage['bootstrap_mask'] = bootstrap_mask[:num_samples]
